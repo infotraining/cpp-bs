@@ -12,6 +12,7 @@
 [Rr]elease/
 x64/
 [Bb]uild/
+[Bb]uild-*/
 _[Bb]uild/
 [Bb]in/
 [Oo]bj/
