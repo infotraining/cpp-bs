@@ -4,6 +4,10 @@
 
 * https://infotraining.bitbucket.io/cpp-bs
 
+## Linki
+
+* C++ Core Guidelines - http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines
+
 ## Środowisko (2 opcje do wyboru)
 
   1. Konfiguracja lokalna
