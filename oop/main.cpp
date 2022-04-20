@@ -56,3 +56,16 @@ TEST_CASE("BankAccount - withdraw")
 
     Banking::print(ba1);
 }
+
+TEST_CASE("BankAccount - interest rate")
+{
+    //BankAccount::set_interest_rate(0.1);
+
+    BankAccount ba1{1, "Jan Kowalski", 100.0};
+
+    ba1.set_interest_rate(0.1);
+
+    ba1.pay_interest(365);
+
+    REQUIRE(ba1.balance() == Approx(110.0));
+}
