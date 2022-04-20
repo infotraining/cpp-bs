@@ -37,7 +37,7 @@ std::vector<uint64_t> primes(const uint64_t limit)
     return found_primes;
 }
 
-void print(const std::string& desc, std::vector<uint64_t>& vec)
+void print(const std::string& desc, const std::vector<uint64_t>& vec)
 {
     std::cout << desc << ": ";
 
@@ -81,9 +81,20 @@ TEST_CASE("reference binding")
         //std::vector<uint64_t>& ref_lvalue = primes(100); // ERROR
     }
 
-    SECTION("rvalue cannot be bound to lvalue ref to const")
+    SECTION("rvalue can be bound to lvalue ref to const")
     {
         const std::vector<uint64_t>& ref_lvalue = primes(100);
+    }
+
+    // since C++11
+    SECTION("rvalue can be bound to rvalue ref")
+    {
+        std::vector<uint64_t>&& ref_rvalue = primes(100);
+    }
+
+    SECTION("lvalue cannot be bound to rvalue ref")
+    {
+        // std::vector<uint64_t>&& ref_rvalue = primes_to_100; // ERROR
     }
 
 }
