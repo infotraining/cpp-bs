@@ -69,7 +69,7 @@ TEST_CASE("c-style array")
 
     SECTION("range-based for")
     {
-        for(const int item : tab)
+        for(const int& item : tab)
         {
             std::cout << item << " ";
         }
