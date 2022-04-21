@@ -69,3 +69,25 @@ TEST_CASE("BankAccount - interest rate")
 
     REQUIRE(ba1.balance() == Approx(110.0));
 }
+
+TEST_CASE("BankAccount - transactions")
+{
+    BankAccount::set_interest_rate(0.1);
+    BankAccount account {665, "Adam Nowak", 100.0};
+
+    REQUIRE(account.transactions().size() == 0);
+
+    account.pay_interest(365);
+    account.withdraw(50.0);
+    account.deposit(100.0);
+    account.withdraw(1.0);
+
+    std::vector<Transaction> expected_transactions = {
+        Transaction {TransactionType::interest, 10.0},
+        Transaction {TransactionType::withdraw, 50.0},
+        Transaction {TransactionType::deposit, 100.0},
+        Transaction {TransactionType::withdraw, 1.0}
+    };
+
+    REQUIRE(account.transactions() == expected_transactions);
+}

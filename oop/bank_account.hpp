@@ -7,10 +7,6 @@ namespace Banking
 {
     class BankAccount
     {
-        const int id_;
-        std::string owner_;
-        double balance_;
-        static double interest_rate_; // declaration
     public:
         static void set_interest_rate(double rate)
         {
@@ -41,9 +37,15 @@ namespace Banking
         void withdraw(double amount);
 
         void pay_interest(int days);
+    private:
+        const int id_;
+        std::string owner_;
+        double balance_;
+        static double interest_rate_; // declaration
     };
 
     void print(const BankAccount& account);
+
 }
 
 #endif // BANK_ACCOUNT_HPP
