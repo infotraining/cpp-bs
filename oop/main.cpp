@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sstream>
 
 using namespace std::literals;
 using namespace Banking;
@@ -90,4 +91,36 @@ TEST_CASE("BankAccount - transactions")
     };
 
     REQUIRE(account.transactions() == expected_transactions);
+}
+
+TEST_CASE("operator== for transactions")
+{
+    int x = 4;
+    int y = 4;
+    REQUIRE(x == y);
+
+    Transaction t1{TransactionType::interest, 1.0};
+    Transaction t2{TransactionType::interest, 1.0};
+    REQUIRE(t1 == t2);
+
+    Transaction t3{TransactionType::deposit, 1.0};
+    REQUIRE(t1 != t3);
+}
+
+TEST_CASE("operator << for transactions")
+{
+    Transaction t{TransactionType::deposit, 100.0};
+
+    std::cout << t << "\n";
+}
+
+
+TEST_CASE("operator << for BankAccount")
+{
+    BankAccount account{665, "Jan Nowak", 100.0};
+
+    std::stringstream ss;
+    ss << account;
+
+    REQUIRE(ss.str() == "BankAccount{id: 665, owner: Jan Nowak, balance: 100}");
 }
