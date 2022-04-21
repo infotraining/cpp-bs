@@ -22,6 +22,10 @@ public:
     typedef int* iterator;
     typedef const int* const_iterator;
 
+    // default constructor
+    MVector() : items_{nullptr}, size_{0}
+    {}
+
     MVector(size_t size)
         : items_{new int[size]}, size_{size}
     {
