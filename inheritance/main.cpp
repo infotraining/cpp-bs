@@ -202,29 +202,48 @@ void kill_em_all(std::vector<IShape*> shape_ptrs)
 }
 
 
+namespace WithRawPointers
+{
+    class Drawing
+    {
+        std::vector<IShape*> shapes_;
+    public:
+        Drawing() = default;
+        Drawing(const Drawing&) = delete;
+        Drawing& operator=(const Drawing&) = delete;
+        Drawing(Drawing&&) = default;
+        Drawing& operator=(Drawing&&) = default;
+
+        ~Drawing() noexcept
+        {
+            kill_em_all(shapes_);
+        }
+
+        void add(IShape* shp)
+        {
+            shapes_.push_back(shp);
+        }
+
+        void render() const
+        {
+            draw_all(shapes_);
+        }
+    };
+}
+
 class Drawing
 {
-    std::vector<IShape*> shapes_;
+    std::vector<std::unique_ptr<IShape>> shapes_;
 public:
-    Drawing() = default;
-    Drawing(const Drawing&) = delete;
-    Drawing& operator=(const Drawing&) = delete;
-    Drawing(Drawing&&) = default;
-    Drawing& operator=(Drawing&&) = default;
-
-    ~Drawing() noexcept
+    void add(std::unique_ptr<IShape> shp)
     {
-        kill_em_all(shapes_);
-    }
-
-    void add(IShape* shp)
-    {
-        shapes_.push_back(shp);
+        shapes_.push_back(std::move(shp));
     }
 
     void render() const
     {
-        draw_all(shapes_);
+        for(auto& shp : shapes_)
+            shp->draw();
     }
 };
 
@@ -279,16 +298,16 @@ int main()
 
     kill_em_all(album_cover);
 
-
     std::cout << "\n---------------\n";
 
     {
         Drawing drw;
 
-        drw.add(new Circle(100, 200, 90));
-        drw.add(new Rectangle(200, 400, 100, 200));
-        drw.add(new Line{100, 100, 500, 600});
-        drw.add(new Polygon{{100, 200}, {200, 400}, {300, 400}});
+        drw.add(std::make_unique<Circle>(100, 200, 90));
+        drw.add(std::make_unique<Rectangle>(200, 400, 100, 200));
+        drw.add(std::make_unique<Line>(100, 100, 500, 600));
+        auto points = {Point{100, 200}, Point{200, 400}, Point{300, 400}};
+        drw.add(std::make_unique<Polygon>(points));
 
         drw.render();
 
@@ -298,7 +317,6 @@ int main()
 
     std::cout << "\n---------------\n";
 
-
     try
     {
         //memory_leak_demo();
@@ -306,7 +324,6 @@ int main()
     }
     catch (...)
     {
-
     }
 }
 
