@@ -124,3 +124,10 @@ TEST_CASE("operator << for BankAccount")
 
     REQUIRE(ss.str() == "BankAccount{id: 665, owner: Jan Nowak, balance: 100}");
 }
+
+TEST_CASE("withdraw too much")
+{
+    BankAccount account{666, "Lars", 1'000'000.0};
+
+    REQUIRE_THROWS_AS(account.withdraw(2'000'000), InsufficientFundsError);
+}

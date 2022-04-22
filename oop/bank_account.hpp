@@ -34,6 +34,13 @@ namespace Banking
         return stream_out;
     }
 
+    struct InsufficientFundsError
+    {
+        const int account_id;
+        const double account_balance;
+        const double amount;
+    };
+
     class BankAccount
     {
     public:

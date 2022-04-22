@@ -24,6 +24,10 @@ void BankAccount::deposit(double amount)
 void BankAccount::withdraw(double amount)
 {
     assert(amount > 0.0);
+
+    if (amount > balance_)
+        throw InsufficientFundsError{id_, balance_, amount};
+
     balance_ -= amount;
 
     transactions_.push_back(Transaction{TransactionType::withdraw, amount});
