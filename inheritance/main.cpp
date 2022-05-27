@@ -363,6 +363,5 @@ void smart_pointer_memory_ok()
     std::shared_ptr<IShape> other_shared_ptr = shared_shp;
 
     std::unique_ptr<IShape> other_ptr = std::move(ptr_shp);
-
-    std::vector<int> vec(1'000'000'000'000);
+    other_ptr->draw();
 }
