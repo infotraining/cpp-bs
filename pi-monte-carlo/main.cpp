@@ -8,6 +8,9 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <sys/mman.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 using namespace std::literals;
 
@@ -124,6 +127,65 @@ void calc_pi_multithreading_with_mutex(uintmax_t n)
     std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms\n";
 }
 
+void calc_pi_multiprocessing(uintmax_t n)
+{
+    const auto no_of_processes = 12;
+    std::cout << "No of processes: " << no_of_processes << "\n";
+
+    auto t_start = std::chrono::high_resolution_clock::now();
+
+    const auto n_per_process = n / no_of_processes;
+
+    // Shared memory allocation
+    uintmax_t *shared_hits = static_cast<uintmax_t *>(
+        mmap(0, sizeof(uintmax_t) * no_of_processes, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, -1, 0));
+
+    pid_t pid;
+
+    for(size_t i = 0; i < no_of_processes; ++i)
+    {
+        pid = fork(); //############################## creating a subprocess (child process with pid == 0)
+
+        if (pid < 0)
+            std::terminate();
+
+        /**************************************************************
+         * child process implementation
+         *************************************************************/
+        if (pid == 0)
+        {
+            // std::cout << "New child process... #" << getpid() << std::endl;
+            uintmax_t hits = count_hits(n_per_process);
+            // std::cout << "Hits#" << getpid() << hits << "\n";
+            shared_hits[i] = hits;
+            _exit(0);
+        }
+    }
+
+    // waiting for all children processes
+    while (wait(NULL) != -1)
+    {
+    }
+
+    uintmax_t total_hits = 0;
+
+    for(int i = 0; i < no_of_processes; ++i)
+        total_hits += shared_hits[i];
+
+    double pi = 4 * (static_cast<double>(total_hits) / n);
+
+    auto t_end = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Pi: " << pi << std::endl;
+    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms\n";
+
+    // shared memory deallocation
+    if (munmap(shared_hits, sizeof(uintmax_t) * no_of_processes) == -1)
+    {
+        std::terminate();
+    }
+}
+
 int main()
 {
     calc_pi_single_thread(N);
@@ -135,4 +197,8 @@ int main()
     std::cout << "\n-----------------------\n";
 
     calc_pi_multithreading_with_mutex(N);
+    
+    std::cout << "\n-----------------------\n";
+
+    calc_pi_multiprocessing(N);
 }
