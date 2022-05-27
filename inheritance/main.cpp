@@ -253,6 +253,75 @@ void raw_pointer_memory_leak();
 
 void smart_pointer_memory_ok();
 
+void memory_leak_demo()
+{
+    std::vector<IShape*> album_cover = {
+        new Circle(100, 200, 90),
+        new Rectangle(200, 400, 100, 200),
+        new Line{100, 100, 500, 600},
+        new Polygon{{100, 200}, {200, 400}, {300, 400}}
+    };
+
+    draw_all(album_cover);
+
+    album_cover.at(100); //xxxxxx
+
+    kill_em_all(album_cover);
+}
+
+void raw_pointer_memory_leak()
+{
+    IShape* ptr_shp = new Circle(100, 200, 300);
+    ptr_shp->draw();
+
+    std::vector<int> vec(1'000'000'000'000);
+
+    delete ptr_shp;
+}
+
+
+void smart_pointer_memory_ok()
+{
+    std::unique_ptr<IShape> ptr_shp = std::make_unique<Circle>(100, 200, 300);
+    ptr_shp->draw();
+
+    std::shared_ptr<IShape> shared_shp = std::make_shared<Circle>(100, 200, 400);
+    std::shared_ptr<IShape> other_shared_ptr = shared_shp;
+
+    std::unique_ptr<IShape> other_ptr = std::move(ptr_shp);
+    other_ptr->draw();
+}
+
+void casting_in_inheritance()
+{
+    Rectangle rect{200, 300, 100, 500};
+    Polygon pgn{{100, 200}, {200, 300}, {100, 100}};
+
+    IShape* ptr_shape = &rect;
+    ptr_shape->draw();
+
+    Rectangle* ptr_rect = static_cast<Rectangle*>(ptr_shape);
+    std::cout << "Width: " << ptr_rect->width() << "\n";
+
+    ptr_shape = &pgn;
+    ptr_shape->draw();
+
+    ptr_rect = dynamic_cast<Rectangle*>(ptr_shape);
+    if (ptr_rect)
+        std::cout << "Width: " << ptr_rect->width() << "\n";
+    else
+        std::cout << "dynamic_cast returned nullptr == different type of shape" << std::endl;
+
+    try
+    {
+        Rectangle& ref_rect = dynamic_cast<Rectangle&>(*ptr_shape);
+    }
+    catch(const std::bad_cast& e)
+    {
+        std::cout << e.what() << "\n";
+    }
+}
+
 int main()
 {
     {
@@ -325,43 +394,8 @@ int main()
     catch (...)
     {
     }
-}
 
-void memory_leak_demo()
-{
-    std::vector<IShape*> album_cover = {
-        new Circle(100, 200, 90),
-        new Rectangle(200, 400, 100, 200),
-        new Line{100, 100, 500, 600},
-        new Polygon{{100, 200}, {200, 400}, {300, 400}}
-    };
+    casting_in_inheritance();
 
-    draw_all(album_cover);
-
-    album_cover.at(100); //xxxxxx
-
-    kill_em_all(album_cover);
-}
-
-void raw_pointer_memory_leak()
-{
-    IShape* ptr_shp = new Circle(100, 200, 300);
-    ptr_shp->draw();
-
-    std::vector<int> vec(1'000'000'000'000);
-
-    delete ptr_shp;
-}
-
-
-void smart_pointer_memory_ok()
-{
-    std::unique_ptr<IShape> ptr_shp = std::make_unique<Circle>(100, 200, 300);
-    ptr_shp->draw();
-
-    std::shared_ptr<IShape> shared_shp = std::make_shared<Circle>(100, 200, 400);
-    std::shared_ptr<IShape> other_shared_ptr = shared_shp;
-
-    std::unique_ptr<IShape> other_ptr = std::move(ptr_shp);
-    other_ptr->draw();
+    std::cout << "\n---------------\n";
 }
